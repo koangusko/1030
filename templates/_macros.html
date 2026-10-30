@@ -31,8 +31,8 @@
   {%- set pct = ((taken / a.capacity) * 100) | round | int if a.capacity else 0 -%}
   <div class="seats">
     <div class="seats-row">
-      <span>剩餘名額</span>
-      <span><strong>{{ a.remaining }}</strong> / {{ a.capacity }}</span>
+      <span>已報名 <strong>{{ taken }}</strong> 人</span>
+      <span>剩餘 <strong>{{ a.remaining }}</strong> / {{ a.capacity }}</span>
     </div>
     <div class="progress" role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100">
       <div class="progress-bar{% if a.remaining <= 0 %} is-full{% endif %}" style="width: {{ pct }}%"></div>
