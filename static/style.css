@@ -1,0 +1,5 @@
+body { font-family: system-ui, sans-serif; max-width: 860px; margin: 2rem auto; padding: 0 16px; }
+table { border-collapse: collapse; margin: 1rem 0; }
+th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+.error { color: #b00020; font-weight: bold; }
+input[type=text], input[type=email] { margin: 4px 0; }
