@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block title %}新增活動{% endblock %}
+
+{% block content %}
+<a href="/" class="back-link">{{ m.icon('arrow-left') }} 回活動列表</a>
+
+<div class="new-wrap">
+  <div class="card form-card">
+    <p class="eyebrow">New Event</p>
+    <h1 class="detail-title">新增活動</h1>
+    <p class="muted new-sub">時間以台灣時間為準，報名截止時間不可晚於活動開始時間。</p>
+
+    {% if error %}
+    <div class="alert alert-error" role="alert">
+      {{ m.icon('alert') }}<span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form method="post" action="/activities" class="form">
+      <div class="field">
+        <label for="title">活動名稱</label>
+        <input id="title" name="title" type="text" required maxlength="100"
+               placeholder="例如：系上烤肉活動" value="{{ form.title or '' }}">
+      </div>
+      <div class="field">
+        <label for="location">地點</label>
+        <input id="location" name="location" type="text" required maxlength="200"
+               placeholder="例如：暨南大學烤肉區" value="{{ form.location or '' }}">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="start_time">開始時間</label>
+          <input id="start_time" name="start_time" type="datetime-local" required value="{{ form.start_time or '' }}">
+        </div>
+        <div class="field">
+          <label for="end_time">結束時間</label>
+          <input id="end_time" name="end_time" type="datetime-local" required value="{{ form.end_time or '' }}">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="deadline">報名截止時間</label>
+          <input id="deadline" name="deadline" type="datetime-local" required value="{{ form.deadline or '' }}">
+        </div>
+        <div class="field">
+          <label for="capacity">名額</label>
+          <input id="capacity" name="capacity" type="number" required min="1" max="100000"
+                 placeholder="50" value="{{ form.capacity or '' }}">
+        </div>
+      </div>
+      <div class="field">
+        <label for="description">活動說明（選填）</label>
+        <textarea id="description" name="description" rows="4"
+                  placeholder="活動內容、注意事項等">{{ form.description or '' }}</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">建立活動</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

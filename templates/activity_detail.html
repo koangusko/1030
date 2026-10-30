@@ -62,10 +62,15 @@
                  placeholder="請輸入姓名" autocomplete="name" value="{{ name or '' }}">
         </div>
         <div class="field">
+          <label for="phone">電話</label>
+          <input id="phone" name="phone" type="tel" required maxlength="20"
+                 placeholder="0912345678" autocomplete="tel" value="{{ phone or '' }}">
+          <p class="hint">同名且同電話視為同一人，同一場活動只能報名一次。</p>
+        </div>
+        <div class="field">
           <label for="email">Email</label>
           <input id="email" name="email" type="email" required maxlength="254"
                  placeholder="name@example.com" autocomplete="email" value="{{ email or '' }}">
-          <p class="hint">同一個 Email 只能報名同一場活動一次。</p>
         </div>
         <button type="submit" class="btn btn-primary btn-block">送出報名</button>
       </form>
@@ -81,6 +86,13 @@
     <a href="/activities/{{ activity.activity_id }}/registrations" class="side-link">
       {{ m.icon('users') }} 查看報名名單 {{ m.icon('arrow-right') }}
     </a>
+
+    {% if s != 'closed' %}
+    <form method="post" action="/activities/{{ activity.activity_id }}/close"
+          onsubmit="return confirm('確定要立即截止報名嗎？截止後將無法再報名。')">
+      <button type="submit" class="btn btn-ghost btn-block">{{ m.icon('flag') }} 立即截止報名</button>
+    </form>
+    {% endif %}
   </aside>
 </div>
 {% endblock %}
