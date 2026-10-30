@@ -1,29 +1,86 @@
-<!DOCTYPE html>
-<html lang="zh-Hant-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ activity.title }}</title>
-    <link rel="stylesheet" href="/static/style.css" />
-  </head>
-<body>
-	<a href="/">回活動列表</a>
-	<h1>{{ activity.title }}</h1>
-	<table>
-	<tr><th>時間</th><td>{{ activity.start_time | tw }} ~ {{ activity.end_time | tw }}</td></tr>
-	<tr><th>地點</th><td>{{ activity.location }}</td></tr>
-	<tr><th>報名截止</th><td>{{ activity.deadline | tw }}</td></tr>
-	<tr><th>剩餘名額</th><td>{{ activity.remaining }} / {{ activity.capacity }}</td></tr>
-	<tr><th>說明</th><td>{{ activity.description or "" }}</td></tr>
-	</table>
-	<p><a href="/activities/{{ activity.activity_id }}/registrations">查看報名名單</a></p>
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
 
-	<h2>報名</h2>
-	{% if error %}<p class="error">{{ error }}</p>{% endif %}
-	<form method="post" action="/activities/{{ activity.activity_id }}/register">
-		<label>姓名 <input type="text" name="name" value="{{ name or '' }}" maxlength="100" required></label><br>
-		<label>Email <input type="email" name="email" value="{{ email or '' }}" maxlength="254" required></label><br>
-		<input type="submit" value="送出報名">
-	</form>
-</body>
-</html>
+{% block title %}{{ activity.title }}{% endblock %}
+
+{% block content %}
+{%- set s = m.status(activity) -%}
+
+<a href="/" class="back-link">{{ m.icon('arrow-left') }} 回活動列表</a>
+
+<div class="detail-layout">
+  <section class="detail-main">
+    <div class="detail-head">
+      {{ m.badge(s) }}
+      <h1 class="detail-title">{{ activity.title }}</h1>
+    </div>
+
+    <dl class="info-grid card">
+      <div class="info-item">
+        <dt>{{ m.icon('clock') }} 活動時間</dt>
+        <dd>{{ m.dt(activity.start_time) }}<span class="muted"> ～ </span>{{ m.dt(activity.end_time) }}</dd>
+      </div>
+      <div class="info-item">
+        <dt>{{ m.icon('pin') }} 地點</dt>
+        <dd>{{ activity.location }}</dd>
+      </div>
+      <div class="info-item">
+        <dt>{{ m.icon('flag') }} 報名截止</dt>
+        <dd>{{ m.dt(activity.deadline) }}</dd>
+      </div>
+      <div class="info-item">
+        <dt>{{ m.icon('users') }} 名額</dt>
+        <dd>{{ m.seats(activity) }}</dd>
+      </div>
+    </dl>
+
+    <div class="card prose">
+      <h2 class="section-title">活動說明</h2>
+      {% if activity.description %}
+        <p class="description">{{ activity.description }}</p>
+      {% else %}
+        <p class="muted">主辦單位尚未提供活動說明。</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <aside class="detail-side">
+    <div class="card form-card">
+      <h2 class="section-title">立即報名</h2>
+
+      {% if error %}
+      <div class="alert alert-error" role="alert">
+        {{ m.icon('alert') }}<span>{{ error }}</span>
+      </div>
+      {% endif %}
+
+      {% if s == 'open' %}
+      <form method="post" action="/activities/{{ activity.activity_id }}/register" class="form">
+        <div class="field">
+          <label for="name">姓名</label>
+          <input id="name" name="name" type="text" required maxlength="100"
+                 placeholder="請輸入姓名" autocomplete="name" value="{{ name or '' }}">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required maxlength="254"
+                 placeholder="name@example.com" autocomplete="email" value="{{ email or '' }}">
+          <p class="hint">同一個 Email 只能報名同一場活動一次。</p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">送出報名</button>
+      </form>
+      {% else %}
+      <div class="closed-box">
+        <p class="closed-title">{{ '報名已截止' if s == 'closed' else '活動名額已滿' }}</p>
+        <p class="muted">此活動目前無法報名，歡迎參考其他活動。</p>
+        <a href="/" class="btn btn-ghost btn-block">瀏覽其他活動</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <a href="/activities/{{ activity.activity_id }}/registrations" class="side-link">
+      {{ m.icon('users') }} 查看報名名單 {{ m.icon('arrow-right') }}
+    </a>
+  </aside>
+</div>
+{% endblock %}

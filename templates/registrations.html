@@ -1,30 +1,60 @@
-<!DOCTYPE html>
-<html lang="zh-Hant-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ activity.title }} 報名名單</title>
-    <link rel="stylesheet" href="/static/style.css" />
-  </head>
-<body>
-	<a href="/activities/{{ activity.activity_id }}">回活動頁</a>
-	<h1>{{ activity.title }} 報名名單</h1>
-	<p>已報名 {{ registrations | length }} / {{ activity.capacity }} 人</p>
-	<table>
-	<tr>
-		<th>#</th>
-		<th>姓名</th>
-		<th>報名時間</th>
-	</tr>
-	{% for p in registrations %}
-	<tr>
-		<td>{{ loop.index }}</td>
-		<td>{{ p.name }}</td>
-		<td>{{ p.registered_at | tw }}</td>
-	</tr>
-	{% else %}
-	<tr><td colspan="3">尚無人報名</td></tr>
-	{% endfor %}
-	</table>
-</body>
-</html>
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block title %}{{ activity.title }} 報名名單{% endblock %}
+
+{% block content %}
+<a href="/activities/{{ activity.activity_id }}" class="back-link">{{ m.icon('arrow-left') }} 回活動詳情</a>
+
+<div class="list-head">
+  <div>
+    <p class="eyebrow">報名名單</p>
+    <h1 class="detail-title">{{ activity.title }}</h1>
+  </div>
+  <div class="stats stats-compact">
+    <div class="stat">
+      <span class="stat-label">已報名</span>
+      <span class="stat-value stat-accent">{{ registrations | length }}</span>
+    </div>
+    {% if activity.capacity is defined %}
+    <div class="stat">
+      <span class="stat-label">名額</span>
+      <span class="stat-value">{{ activity.capacity }}</span>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card table-card">
+  {% if registrations %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="col-no">#</th>
+        <th>姓名</th>
+        <th>報名時間</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in registrations %}
+      <tr>
+        <td class="col-no muted">{{ loop.index }}</td>
+        <td>
+          <span class="avatar" aria-hidden="true">{{ r.name[:1] }}</span>{{ r.name }}
+        </td>
+        <td class="muted">{{ m.dt(r.registered_at) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">
+    <p class="empty-title">目前還沒有人報名</p>
+    <p class="muted">成為第一位報名者吧！</p>
+    <a href="/activities/{{ activity.activity_id }}" class="btn btn-primary">前往報名</a>
+  </div>
+  {% endif %}
+</div>
+
+<p class="notice">{{ m.icon('alert') }} 此名單僅供展示，為保護個資不顯示 Email。</p>
+{% endblock %}

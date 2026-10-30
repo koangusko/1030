@@ -1,21 +1,28 @@
-<!DOCTYPE html>
-<html lang="zh-Hant-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>報名成功</title>
-    <link rel="stylesheet" href="/static/style.css" />
-  </head>
-<body>
-	<h1>報名成功</h1>
-	<table>
-	<tr><th>報名編號</th><td>{{ r.registration_id }}</td></tr>
-	<tr><th>姓名</th><td>{{ r.name }}</td></tr>
-	<tr><th>報名時間</th><td>{{ r.registered_at | tw }}</td></tr>
-	<tr><th>活動</th><td><a href="/activities/{{ r.activity_id }}">{{ r.title }}</a></td></tr>
-	<tr><th>時間</th><td>{{ r.start_time | tw }} ~ {{ r.end_time | tw }}</td></tr>
-	<tr><th>地點</th><td>{{ r.location }}</td></tr>
-	</table>
-	<p><a href="/">回活動列表</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block title %}報名成功{% endblock %}
+
+{% block content %}
+<section class="success-wrap">
+  <div class="card success-card">
+    <div class="success-icon">{{ m.icon('check') }}</div>
+    <h1 class="success-title">報名成功！</h1>
+    <p class="muted">{{ r.name }}，您已成功報名以下活動。</p>
+
+    <dl class="summary">
+      <div><dt>報名編號</dt><dd class="mono">#{{ r.registration_id }}</dd></div>
+      <div><dt>活動名稱</dt><dd>{{ r.title }}</dd></div>
+      <div><dt>活動時間</dt><dd>{{ m.dt(r.start_time) }}{% if r.end_time %} ～ {{ m.dt(r.end_time) }}{% endif %}</dd></div>
+      <div><dt>地點</dt><dd>{{ r.location }}</dd></div>
+      {% if r.email %}<div><dt>Email</dt><dd>{{ m.mask_email(r.email) }}</dd></div>{% endif %}
+      <div><dt>報名時間</dt><dd>{{ m.dt(r.registered_at) }}</dd></div>
+    </dl>
+
+    <div class="actions">
+      <a href="/activities/{{ r.activity_id }}" class="btn btn-ghost">回活動頁面</a>
+      <a href="/" class="btn btn-primary">瀏覽更多活動</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
