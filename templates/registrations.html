@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ activity.title }} 報名名單</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+<body>
+	<a href="/activities/{{ activity.activity_id }}">回活動頁</a>
+	<h1>{{ activity.title }} 報名名單</h1>
+	<p>已報名 {{ registrations | length }} / {{ activity.capacity }} 人</p>
+	<table>
+	<tr>
+		<th>#</th>
+		<th>姓名</th>
+		<th>報名時間</th>
+	</tr>
+	{% for p in registrations %}
+	<tr>
+		<td>{{ loop.index }}</td>
+		<td>{{ p.name }}</td>
+		<td>{{ p.registered_at | tw }}</td>
+	</tr>
+	{% else %}
+	<tr><td colspan="3">尚無人報名</td></tr>
+	{% endfor %}
+	</table>
+</body>
+</html>

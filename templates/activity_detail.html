@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ activity.title }}</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+<body>
+	<a href="/">回活動列表</a>
+	<h1>{{ activity.title }}</h1>
+	<table>
+	<tr><th>時間</th><td>{{ activity.start_time | tw }} ~ {{ activity.end_time | tw }}</td></tr>
+	<tr><th>地點</th><td>{{ activity.location }}</td></tr>
+	<tr><th>報名截止</th><td>{{ activity.deadline | tw }}</td></tr>
+	<tr><th>剩餘名額</th><td>{{ activity.remaining }} / {{ activity.capacity }}</td></tr>
+	<tr><th>說明</th><td>{{ activity.description or "" }}</td></tr>
+	</table>
+	<p><a href="/activities/{{ activity.activity_id }}/registrations">查看報名名單</a></p>
+
+	<h2>報名</h2>
+	{% if error %}<p class="error">{{ error }}</p>{% endif %}
+	<form method="post" action="/activities/{{ activity.activity_id }}/register">
+		<label>姓名 <input type="text" name="name" value="{{ name or '' }}" maxlength="100" required></label><br>
+		<label>Email <input type="email" name="email" value="{{ email or '' }}" maxlength="254" required></label><br>
+		<input type="submit" value="送出報名">
+	</form>
+</body>
+</html>

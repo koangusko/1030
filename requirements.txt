@@ -1,0 +1,7 @@
+fastapi[standard]
+uvicorn
+jinja2
+python-multipart
+psycopg[binary]
+psycopg-pool
+python-dotenv

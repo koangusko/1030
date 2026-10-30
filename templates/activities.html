@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>活動列表</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+<body>
+	<h1>活動列表</h1>
+	<table>
+	<tr>
+		<th>活動名稱</th>
+		<th>時間</th>
+		<th>地點</th>
+		<th>剩餘名額</th>
+		<th></th>
+	</tr>
+	{% for a in activities %}
+	<tr>
+		<td><a href="/activities/{{ a.activity_id }}">{{ a.title }}</a></td>
+		<td>{{ a.start_time | tw }} ~ {{ a.end_time | tw }}</td>
+		<td>{{ a.location }}</td>
+		<td>{{ a.remaining }} / {{ a.capacity }}</td>
+		<td>{% if a.closed %}已截止{% elif a.remaining <= 0 %}已額滿{% else %}報名中{% endif %}</td>
+	</tr>
+	{% else %}
+	<tr><td colspan="5">目前沒有活動</td></tr>
+	{% endfor %}
+	</table>
+</body>
+</html>
