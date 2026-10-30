@@ -1,31 +1,50 @@
-# db.py
+import os
+from pathlib import Path
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, Depends
-from psycopg_pool import AsyncConnectionPool
-from psycopg.rows import dict_row
 
-# Lifespan context manager for FastAPI
+from dotenv import load_dotenv
+from fastapi import FastAPI, Request
+from psycopg.rows import dict_row
+from psycopg_pool import AsyncConnectionPool
+
+
+# 讀取與 db.py 同一個資料夾裡的 .env
+load_dotenv(Path(__file__).with_name(".env"))
+
+
+def connection_settings():
+    return {
+        "host": os.getenv("DB_HOST", "localhost"),
+        "port": int(os.getenv("DB_PORT", "5432")),
+        "dbname": os.getenv("DB_NAME", "event_platform"),
+        "user": os.getenv("DB_USER", "postgres"),
+        "password": os.environ["DB_PASSWORD"],
+        "connect_timeout": 5,
+        "row_factory": dict_row,
+    }
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-	app.state.pool = AsyncConnectionPool(
-		conninfo = "postgresql://postgres:123456@localhost:5432/mydb",
-		kwargs={"row_factory": dict_row},
-		open=False,
-		#min_size=1,
-		#max_size=10,
-		#timeout=10,
-		)
-	await app.state.pool.open()
-	print("✅ Connected to DB")
+    pool = AsyncConnectionPool(
+        conninfo="",
+        kwargs=connection_settings(),
+        min_size=1,
+        max_size=5,
+        open=False,
+    )
 
-	yield  # App runs here
+    app.state.pool = pool
 
-	# Shutdown logic
-	await app.state.pool.close()
-	print("🛑 Disconnected from DB")
+    try:
+        await pool.open(wait=True, timeout=10)
+        print("Connected to event_platform")
+        yield
+    finally:
+        await pool.close()
 
-#a wrapper for fastAPI's Depends Injection
+
+# 提供給路由的 Depends(getDB) 使用
 async def getDB(request: Request):
-	async with request.app.state.pool.connection() as conn:
-		#set cuurent login user from session
-		yield conn
+    async with request.app.state.pool.connection() as conn:
+        yield conn
