@@ -296,6 +296,20 @@ h1, h2, p { margin: 0; }
 }
 .notice { display: flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 13px; color: var(--text-3); }
 
+/* ---------- 新增活動 ---------- */
+.new-wrap { max-width: 640px; margin: 0 auto; }
+.new-sub { margin: 6px 0 24px; font-size: 14px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.field textarea {
+  padding: 10px 14px; resize: vertical;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text);
+  font: inherit;
+  transition: border-color .15s, box-shadow .15s;
+}
+.field textarea::placeholder { color: var(--text-3); }
+.field textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99,102,241,.15); }
+
 /* ---------- 響應式 ---------- */
 @media (max-width: 860px) {
   .detail-layout { grid-template-columns: 1fr; }
@@ -308,6 +322,7 @@ h1, h2, p { margin: 0; }
   .hero-title { font-size: 26px; }
   .detail-title { font-size: 23px; }
   .info-grid { grid-template-columns: 1fr; }
+  .field-row { grid-template-columns: 1fr; }
   .info-item:nth-child(odd) { border-right: 0; }
   .info-item:nth-last-child(2) { border-bottom: 1px solid var(--border); }
   .success-card { padding: 32px 20px 24px; }

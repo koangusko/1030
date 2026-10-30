@@ -19,16 +19,20 @@ CREATE TABLE activities (
     CHECK (length(trim(location)) > 0)
 );
 
--- 報名者資料
+-- 報名者資料（同名且同電話視為同一人）
 CREATE TABLE participants (
     participant_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    email VARCHAR(254) NOT NULL UNIQUE,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(254) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CHECK (length(trim(name)) > 0),
+    CHECK (phone ~ '^\+?[0-9]{8,15}$'),
     CHECK (length(trim(email)) > 0),
-    CHECK (email = lower(trim(email)))
+    CHECK (email = lower(trim(email))),
+
+    UNIQUE (name, phone)
 );
 
 -- 報名紀錄
