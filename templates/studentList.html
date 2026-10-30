@@ -8,6 +8,7 @@
   </head>
 <body>
 	<h1>List Students from table</h1>
+	<a href="/student/add">Add</a>
 	<table>
 	<tr>
 		<td>流水號</td>
@@ -19,6 +20,7 @@
 		<td>{{ loop.index }}:<a href="/student/edit/{{p.stuid }}">Edit</a></td>
 		<td>{{ p.stuid }} </td>
 		<td>{{ p.name }}</td>
+		<td><form method="post" action="/student/delete"><input type="hidden" name="stuid" value="{{ p.stuid }}"><input type="submit" value="滾"></form></td>
 	</tr>
 	{% endfor %}
 	</table>
