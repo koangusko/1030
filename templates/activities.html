@@ -1,32 +1,54 @@
-<!DOCTYPE html>
-<html lang="zh-Hant-TW">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>活動列表</title>
-    <link rel="stylesheet" href="/static/style.css" />
-  </head>
-<body>
-	<h1>活動列表</h1>
-	<table>
-	<tr>
-		<th>活動名稱</th>
-		<th>時間</th>
-		<th>地點</th>
-		<th>剩餘名額</th>
-		<th></th>
-	</tr>
-	{% for a in activities %}
-	<tr>
-		<td><a href="/activities/{{ a.activity_id }}">{{ a.title }}</a></td>
-		<td>{{ a.start_time | tw }} ~ {{ a.end_time | tw }}</td>
-		<td>{{ a.location }}</td>
-		<td>{{ a.remaining }} / {{ a.capacity }}</td>
-		<td>{% if a.closed %}已截止{% elif a.remaining <= 0 %}已額滿{% else %}報名中{% endif %}</td>
-	</tr>
-	{% else %}
-	<tr><td colspan="5">目前沒有活動</td></tr>
-	{% endfor %}
-	</table>
-</body>
-</html>
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+
+{% block title %}所有活動{% endblock %}
+
+{% block content %}
+{%- set ns = namespace(open=0) -%}
+{%- for a in activities if m.status(a) == 'open' -%}{% set ns.open = ns.open + 1 %}{%- endfor -%}
+
+<section class="hero">
+  <p class="eyebrow">Campus Events</p>
+  <h1 class="hero-title">探索<span class="gradient-text">校園活動</span></h1>
+  <p class="hero-sub">瀏覽近期活動，填寫姓名與 Email 即可完成報名。</p>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-label">活動總數</span>
+      <span class="stat-value">{{ activities | length }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">報名中</span>
+      <span class="stat-value stat-accent">{{ ns.open }}</span>
+    </div>
+  </div>
+</section>
+
+{% if activities %}
+<section class="grid">
+  {% for a in activities %}
+  {% set s = m.status(a) %}
+  <article class="card event-card{% if s != 'open' %} is-inactive{% endif %}">
+    <div class="event-card-head">
+      {{ m.badge(s) }}
+    </div>
+    <h2 class="event-title">
+      <a href="/activities/{{ a.activity_id }}" class="stretched">{{ a.title }}</a>
+    </h2>
+    <ul class="meta">
+      <li>{{ m.icon('clock') }}<span>{{ m.dt(a.start_time) }}</span></li>
+      <li>{{ m.icon('pin') }}<span>{{ a.location }}</span></li>
+      <li>{{ m.icon('flag') }}<span>截止 {{ m.dt(a.deadline) }}</span></li>
+    </ul>
+    {{ m.seats(a) }}
+    <span class="card-link">查看詳情 {{ m.icon('arrow-right') }}</span>
+  </article>
+  {% endfor %}
+</section>
+{% else %}
+<div class="card empty">
+  <p class="empty-title">目前沒有活動</p>
+  <p class="muted">敬請期待即將推出的校園活動。</p>
+</div>
+{% endif %}
+{% endblock %}

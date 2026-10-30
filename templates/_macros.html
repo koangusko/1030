@@ -1,0 +1,61 @@
+{#- 共用小工具：時間格式、活動狀態、Email 遮罩 -#}
+
+{#- 時間：用後端註冊的 tw 過濾器（轉台灣時間）；沒有的話直接格式化 -#}
+{% macro dt(value) -%}
+  {%- if value is none -%}—
+  {%- elif 'tw' is filter -%}{{ value | tw }}
+  {%- elif value.strftime is defined -%}{{ value.strftime('%Y/%m/%d %H:%M') }}
+  {%- else -%}{{ value }}
+  {%- endif -%}
+{%- endmacro %}
+
+{#- 活動狀態：closed（已截止）> full（已額滿）> open（可報名）
+    截止判斷以資料庫時間為準：db.py 回傳的 closed 欄位 -#}
+{% macro status(a) -%}
+  {%- if a.closed -%}closed
+  {%- elif a.remaining is defined and a.remaining <= 0 -%}full
+  {%- else -%}open
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro badge(s) -%}
+  {%- if s == 'closed' -%}<span class="badge badge-muted">已截止</span>
+  {%- elif s == 'full' -%}<span class="badge badge-danger">已額滿</span>
+  {%- else -%}<span class="badge badge-success">報名中</span>
+  {%- endif -%}
+{%- endmacro %}
+
+{#- 名額進度條 -#}
+{% macro seats(a) -%}
+  {%- set taken = a.capacity - a.remaining -%}
+  {%- set pct = ((taken / a.capacity) * 100) | round | int if a.capacity else 0 -%}
+  <div class="seats">
+    <div class="seats-row">
+      <span>剩餘名額</span>
+      <span><strong>{{ a.remaining }}</strong> / {{ a.capacity }}</span>
+    </div>
+    <div class="progress" role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar{% if a.remaining <= 0 %} is-full{% endif %}" style="width: {{ pct }}%"></div>
+    </div>
+  </div>
+{%- endmacro %}
+
+{% macro mask_email(email) -%}
+  {%- set parts = email.split('@') -%}
+  {{- parts[0][:1] }}***@{{ parts[1] if parts | length > 1 else '' -}}
+{%- endmacro %}
+
+{#- 小圖示 -#}
+{% macro icon(name) -%}
+<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  {%- if name == 'clock' -%}<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+  {%- elif name == 'pin' -%}<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>
+  {%- elif name == 'flag' -%}<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>
+  {%- elif name == 'users' -%}<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a5.5 5.5 0 0 1 3.5 6"/>
+  {%- elif name == 'arrow-left' -%}<path d="M19 12H5M11 6l-6 6 6 6"/>
+  {%- elif name == 'arrow-right' -%}<path d="M5 12h14M13 6l6 6-6 6"/>
+  {%- elif name == 'alert' -%}<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16h.01"/>
+  {%- elif name == 'check' -%}<path d="M5 12.5l4.5 4.5L19 7.5"/>
+  {%- endif -%}
+</svg>
+{%- endmacro %}
